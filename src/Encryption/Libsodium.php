@@ -16,6 +16,7 @@ use function sodium_crypto_secretstream_xchacha20poly1305_pull;
 use function sodium_crypto_secretstream_xchacha20poly1305_push;
 use function stream_get_contents;
 use function stream_set_chunk_size;
+use function strlen;
 use const SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES;
 use const SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES;
 use const SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL;
@@ -118,19 +119,15 @@ class Libsodium implements EncryptionInterface
             return;
         }
 
-        $additionalData           = [];
-        $additionalData['header'] = $header;
-        $additionalData['stream'] = sodium_crypto_secretstream_xchacha20poly1305_init_pull($header, $this->key);
+        $stream = sodium_crypto_secretstream_xchacha20poly1305_init_pull($header, $this->key);
 
         stream_set_chunk_size($resource, $this->chunkSize + SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES);
-
         append(
             $resource,
-            static function (string $chunk) use (&$additionalData): string {
+            static function (string $chunk) use (&$stream): string {
                 $payload = '';
 
-                [$decryptedChunk, $tag] = sodium_crypto_secretstream_xchacha20poly1305_pull($additionalData['stream'], $chunk);
-                $additionalData['tag'] = $tag;
+                [$decryptedChunk, $tag] = sodium_crypto_secretstream_xchacha20poly1305_pull($stream, $chunk);
 
                 $payload .= $decryptedChunk;
 

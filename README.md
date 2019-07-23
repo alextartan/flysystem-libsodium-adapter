@@ -1,6 +1,6 @@
 # Libsodium Adapter for Flysystem
 
-Work in progress...
+Work in progress... (see notice below)
 
 Current build status
 ===
@@ -35,3 +35,20 @@ $adapterDecorator = new EncryptionAdapterDecorator(
 
 $filesystem = new Filesystem($adapterDecorator);
 ```
+
+**Notice**;
+
+Encryption does not work with `writeStream`/`readStream` and `AWS S3` (and probably other remote adapters). 
+
+When using non-local adapters, use `write`/`read`. The downside of this is the high memory usage, as files 
+are entirely loaded in memory.
+
+The issue (as far as I've investigated) is related to `ContentLenght` which is not properly calculated.
+The encrypted result is bigger than the original.
+
+This is still a work in progress. I hope to get this working with S3 soon.
+
+
+## Versoning
+
+This library adheres to [semver](https://semver.org/)
