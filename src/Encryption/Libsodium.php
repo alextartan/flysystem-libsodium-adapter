@@ -84,7 +84,7 @@ class Libsodium implements EncryptionInterface
 
                 $payload .= $encryptedChunk;
 
-                $counter += strlen($chunk);
+                $counter += mb_strlen($chunk);
 
                 return $payload;
             }

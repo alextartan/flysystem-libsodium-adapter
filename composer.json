@@ -18,7 +18,6 @@
     "php": ">=7.2",
     "ext-mbstring": "*",
     "clue/stream-filter": "^1.4.1",
-    "defuse/php-encryption": "^2.2",
     "league/flysystem": "^1.0.53",
     "league/flysystem-adapter-decorator": "^1.0.0"
   },

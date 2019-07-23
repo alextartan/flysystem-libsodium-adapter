@@ -1,5 +1,6 @@
 # Libsodium Adapter for Flysystem
 
+Work in progress...
 
 ## Installation
 
