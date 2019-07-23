@@ -6,6 +6,19 @@ namespace AlexTartan\Flysystem\Adapter\Encryption;
 
 use InvalidArgumentException;
 use function Clue\StreamFilter\append;
+use function fopen;
+use function fwrite;
+use function rewind;
+use function sodium_crypto_secretstream_xchacha20poly1305_init_pull;
+use function sodium_crypto_secretstream_xchacha20poly1305_init_push;
+use function sodium_crypto_secretstream_xchacha20poly1305_pull;
+use function sodium_crypto_secretstream_xchacha20poly1305_push;
+use function stream_get_contents;
+use function stream_set_chunk_size;
+use const SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES;
+use const SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES;
+use const SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL;
+use const SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_MESSAGE;
 
 class Libsodium implements EncryptionInterface
 {

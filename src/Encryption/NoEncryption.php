@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace AlexTartan\Flysystem\Adapter\Encryption;
 
 use function Clue\StreamFilter\append;
+use function fopen;
+use function fwrite;
+use function rewind;
+use function stream_get_contents;
 
 class NoEncryption implements EncryptionInterface
 {

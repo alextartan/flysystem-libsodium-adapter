@@ -6,11 +6,21 @@ namespace AlexTartanTest\Flysystem\Adapter\Encryption;
 
 use AlexTartan\Flysystem\Adapter\Encryption\Libsodium;
 use AlexTartan\Flysystem\Adapter\EncryptionAdapterDecorator;
+use InvalidArgumentException;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Memory\MemoryAdapter;
 use League\Flysystem\Util;
 use PHPUnit\Framework\TestCase;
+use function base64_decode;
+use function bin2hex;
+use function fopen;
+use function fwrite;
+use function openssl_random_pseudo_bytes;
+use function rewind;
+use function sha1;
+use function stream_get_contents;
+use function stream_set_chunk_size;
 
 /**
  * @covers \AlexTartan\Flysystem\Adapter\Encryption\Libsodium
@@ -113,7 +123,7 @@ class LibsodiumTest extends TestCase
     /** @dataProvider invalidChunkSizeProvider */
     public function testInvalidChinkSize(int $chunkSize): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid chunk size');
 
         $this->createEncryptedTestFilesystem(new MemoryAdapter(), self::KEY, $chunkSize);

@@ -11,6 +11,8 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\Memory\MemoryAdapter;
 use League\Flysystem\Util;
 use PHPUnit\Framework\TestCase;
+use function bin2hex;
+use function openssl_random_pseudo_bytes;
 
 /**
  * @covers \AlexTartan\Flysystem\Adapter\Encryption\NoEncryption
