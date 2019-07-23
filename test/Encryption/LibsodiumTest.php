@@ -24,6 +24,7 @@ use function stream_set_chunk_size;
 
 /**
  * @covers \AlexTartan\Flysystem\Adapter\Encryption\Libsodium
+ * @covers \AlexTartan\Flysystem\Adapter\EncryptionAdapterDecorator
  */
 class LibsodiumTest extends TestCase
 {

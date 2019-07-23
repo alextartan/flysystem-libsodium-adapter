@@ -16,6 +16,7 @@ use function openssl_random_pseudo_bytes;
 
 /**
  * @covers \AlexTartan\Flysystem\Adapter\Encryption\NoEncryption
+ * @covers \AlexTartan\Flysystem\Adapter\EncryptionAdapterDecorator
  */
 class NoEncryptionTest extends TestCase
 {
