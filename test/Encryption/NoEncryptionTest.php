@@ -15,7 +15,6 @@ use function bin2hex;
 use function openssl_random_pseudo_bytes;
 
 /**
- * @covers \AlexTartan\Flysystem\Adapter\Encryption\AbstractEncryption
  * @covers \AlexTartan\Flysystem\Adapter\Encryption\NoEncryption
  * @covers \AlexTartan\Flysystem\Adapter\EncryptionAdapterDecorator
  */

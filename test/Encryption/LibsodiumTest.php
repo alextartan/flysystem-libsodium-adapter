@@ -23,7 +23,6 @@ use function stream_get_contents;
 use function stream_set_chunk_size;
 
 /**
- * @covers \AlexTartan\Flysystem\Adapter\Encryption\AbstractEncryption
  * @covers \AlexTartan\Flysystem\Adapter\Encryption\Libsodium
  * @covers \AlexTartan\Flysystem\Adapter\EncryptionAdapterDecorator
  */
@@ -104,7 +103,6 @@ class LibsodiumTest extends TestCase
         );
     }
 
-
     /**
      * @return null|resource
      */
@@ -155,6 +153,7 @@ class LibsodiumTest extends TestCase
         if ($readContent === false) {
             static::fail('cannot read file');
         }
+
         static::assertNotSame($content, $readContent['contents']);
     }
 
