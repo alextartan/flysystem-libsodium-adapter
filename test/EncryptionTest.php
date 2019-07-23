@@ -26,6 +26,14 @@ class EncryptionTest extends TestCase
         ];
     }
 
+    public function invalidChunkSizeProvider(): array
+    {
+        return [
+            [24],
+            [8193],
+        ];
+    }
+
     private function createTestFilesystem(): Filesystem
     {
         return new Filesystem(new MemoryAdapter());
@@ -46,7 +54,7 @@ class EncryptionTest extends TestCase
         return $key;
     }
 
-    protected function createEncryptedTestFilesystem(
+    private function createEncryptedTestFilesystem(
         AdapterInterface $adapter,
         string $encryptionKey,
         int $chunkSize
@@ -60,6 +68,15 @@ class EncryptionTest extends TestCase
                 )
             )
         );
+    }
+
+    /** @dataProvider invalidChunkSizeProvider */
+    public function testInvalidChinkSize(int $chunkSize): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid chunk size');
+
+        $this->createEncryptedTestFilesystem(new MemoryAdapter(), self::KEY, $chunkSize);
     }
 
     /** @dataProvider chunkSizeProvider */
