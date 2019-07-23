@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AlexTartan\Flysystem\Adapter\Encryption;
 
+use AlexTartan\Flysystem\Adapter\Exception\EncryptionException;
 use InvalidArgumentException;
 use function Clue\StreamFilter\append;
 use function fopen;
@@ -41,35 +42,29 @@ class Libsodium implements EncryptionInterface
         $this->chunkSize = $chunkSize;
     }
 
-    public function encrypt(string $contents): ?string
+    public function encrypt(string $contents): string
     {
         $source = $this->createTemporaryStreamFromContents($contents);
-        if ($source === null) {
-            return null;
-        }
 
         $this->appendEncryptStreamFilter($source);
 
         $result = stream_get_contents($source);
         if ($result === false) {
-            return null;
+            throw new EncryptionException();
         }
 
         return $result;
     }
 
-    public function decrypt(string $contents): ?string
+    public function decrypt(string $contents): string
     {
         $source = $this->createTemporaryStreamFromContents($contents);
-        if ($source === null) {
-            return null;
-        }
 
         $this->appendDecryptStreamFilter($source);
 
         $result = stream_get_contents($source);
         if ($result === false) {
-            return null;
+            throw new EncryptionException();
         }
 
         return $result;
@@ -145,13 +140,13 @@ class Libsodium implements EncryptionInterface
     }
 
     /**
-     * @return null|resource
+     * @return resource
      */
     private function createTemporaryStreamFromContents(string $contents)
     {
         $source = fopen('php://memory', 'wb+');
         if ($source === false) {
-            return null;
+            throw new EncryptionException();
         }
         stream_set_chunk_size($source, $this->chunkSize);
 

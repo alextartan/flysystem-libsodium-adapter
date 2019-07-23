@@ -49,9 +49,6 @@ final class EncryptionAdapterDecorator implements AdapterInterface
     public function write($path, $contents, Config $config)
     {
         $encryptedContent = $this->encryption->encrypt($contents);
-        if ($encryptedContent === null) {
-            return false;
-        }
 
         return $this->getDecoratedAdapter()->write($path, $encryptedContent, $config);
     }

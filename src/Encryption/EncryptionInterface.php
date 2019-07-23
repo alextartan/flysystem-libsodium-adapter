@@ -5,9 +5,9 @@ namespace AlexTartan\Flysystem\Adapter\Encryption;
 
 interface EncryptionInterface
 {
-    public function encrypt(string $plainText): ?string;
+    public function encrypt(string $plainText): string;
 
-    public function decrypt(string $encryptedText): ?string;
+    public function decrypt(string $encryptedText): string;
 
     /** @param resource $resource */
     public function appendEncryptStreamFilter($resource): void;

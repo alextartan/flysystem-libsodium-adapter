@@ -10,6 +10,7 @@ use League\Flysystem\Filesystem;
 use PHPStan\Testing\TestCase;
 use function base64_decode;
 use function file_get_contents;
+use function fopen;
 use function stream_get_contents;
 
 class IntegrationTest extends TestCase
@@ -26,11 +27,20 @@ class IntegrationTest extends TestCase
     {
         parent::setUp();
 
+        $keyPart1 = base64_decode('ZG9Mc1U4ZGtlZ0thWXJxNXhtNTJTc1I5YjdjWm8vMlM1ZzlsRTJFZlNQST0=', true);
+        if ($keyPart1 === false) {
+            self::fail('cannot extract key');
+        }
+        $key = base64_decode($keyPart1, true);
+        if ($key === false) {
+            self::fail('cannot extract key');
+        }
+
         $this->encryptedFs = new Filesystem(
             new EncryptionAdapterDecorator(
                 new Local(self::STORAGE_LOCATION),
                 new Libsodium(
-                    base64_decode(base64_decode('ZG9Mc1U4ZGtlZ0thWXJxNXhtNTJTc1I5YjdjWm8vMlM1ZzlsRTJFZlNQST0=')),
+                    $key,
                     8192
                 )
             )
@@ -45,17 +55,18 @@ class IntegrationTest extends TestCase
     {
         $file = __DIR__ . '/../data/file1';
 
-        if ($this->encryptedFs->has('somepath')) {
-            $this->encryptedFs->delete('somepath');
+        if ($this->encryptedFs->has('somePath')) {
+            $this->encryptedFs->delete('somePath');
         }
-        $this->encryptedFs->writeStream(
-            'somepath',
-            fopen($file, 'rb')
-        );
+        $resource = fopen($file, 'rb');
+        if ($resource === false) {
+            self::fail('cannot open file');
+        }
+        $this->encryptedFs->writeStream('somePath', $resource);
 
         self::assertNotEquals(
             file_get_contents($file),
-            file_get_contents(__DIR__ . '/../data/storage/somepath'),
+            file_get_contents(__DIR__ . '/../data/storage/somePath')
         );
     }
 
@@ -63,25 +74,70 @@ class IntegrationTest extends TestCase
     {
         $file = __DIR__ . '/../data/file1';
 
-        if ($this->encryptedFs->has('somepath')) {
-            $this->encryptedFs->delete('somepath');
+        if ($this->encryptedFs->has('somePath')) {
+            $this->encryptedFs->delete('somePath');
         }
         if ($this->plaintextFs->has('original')) {
             $this->plaintextFs->delete('original');
         }
-        $this->encryptedFs->writeStream(
-            'somepath',
-            fopen($file, 'rb')
-        );
+
+        $resource = fopen($file, 'rb');
+        if ($resource === false) {
+            self::fail('cannot open file');
+        }
+        $this->encryptedFs->writeStream('somePath', $resource);
+
+        $readStream = $this->encryptedFs->readStream('somePath');
+        if ($readStream === false) {
+            self::fail('cannot read file stream');
+        }
+
+        $contents = stream_get_contents($readStream);
+        if ($contents === false) {
+            self::fail('cannot open file');
+        }
 
         $this->plaintextFs->write(
             'original',
-            stream_get_contents($this->encryptedFs->readStream('somepath'))
+            $contents
         );
 
         self::assertFileEquals(
             $file,
-            __DIR__ . '/../data/storage/original',
+            __DIR__ . '/../data/storage/original'
+        );
+    }
+
+    public function testFileGetsEncryptedInMemoryAndDecryptedBack(): void
+    {
+        $file = __DIR__ . '/../data/file1';
+
+        if ($this->encryptedFs->has('somePath')) {
+            $this->encryptedFs->delete('somePath');
+        }
+        if ($this->plaintextFs->has('original')) {
+            $this->plaintextFs->delete('original');
+        }
+
+        $contents = file_get_contents($file);
+        if ($contents === false) {
+            self::fail('cannot read file');
+        }
+        $this->encryptedFs->write('somePath', $contents);
+
+        $contents = $this->encryptedFs->read('somePath');
+        if ($contents === false) {
+            self::fail('cannot open file');
+        }
+
+        $this->plaintextFs->write(
+            'original',
+            $contents
+        );
+
+        self::assertFileEquals(
+            $file,
+            __DIR__ . '/../data/storage/original'
         );
     }
 }
