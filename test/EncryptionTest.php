@@ -80,7 +80,7 @@ class EncryptionTest extends TestCase
     }
 
     /** @dataProvider chunkSizeProvider */
-    public function testStoredContentIsEncrypted($chunkSize): void
+    public function testStoredContentIsEncrypted(int $chunkSize): void
     {
         $filePath    = '/demo.txt';
         $randomBytes = openssl_random_pseudo_bytes(20);
@@ -99,11 +99,15 @@ class EncryptionTest extends TestCase
         static::assertSame($content, $filesystem->read($filePath));
 
         //raw data
-        static::assertNotSame($content, $adapter->read(Util::normalizePath($filePath)));
+        $readContent = $adapter->read(Util::normalizePath($filePath));
+        if ($readContent === false) {
+            static::fail('cannot read file');
+        }
+        static::assertNotSame($content, $readContent['contents']);
     }
 
     /** @dataProvider chunkSizeProvider */
-    public function testEncryptionAndDecryption($chunkSize): void
+    public function testEncryptionAndDecryption(int $chunkSize): void
     {
         $filePath    = '/demo.txt';
         $randomBytes = openssl_random_pseudo_bytes(20);
@@ -118,13 +122,19 @@ class EncryptionTest extends TestCase
         static::assertTrue($sourceFilesystem->has($filePath));
 
         $targetFilesystem = $this->createEncryptedTestFilesystem(new MemoryAdapter(), self::KEY, $chunkSize);
-        $targetFilesystem->put($filePath, $sourceFilesystem->read($filePath));
+
+        $contents = $sourceFilesystem->read($filePath);
+        if ($contents === false) {
+            static::fail('cannot read file');
+        }
+
+        $targetFilesystem->put($filePath, $contents);
 
         static::assertSame($content, $targetFilesystem->read($filePath));
     }
 
     /** @dataProvider chunkSizeProvider */
-    public function testEncryptionAndDecryptionUpdateText($chunkSize): void
+    public function testEncryptionAndDecryptionUpdateText(int $chunkSize): void
     {
         $filePath    = '/demo.txt';
         $randomBytes = openssl_random_pseudo_bytes(20);
@@ -170,6 +180,9 @@ class EncryptionTest extends TestCase
     public function testStreamedBinaryFile(int $chunkSize): void
     {
         $binaryBlob = openssl_random_pseudo_bytes(2000000);
+        if ($binaryBlob === false) {
+            static::fail('cannot get random bytes');
+        }
 
         $source = fopen('php://memory', 'wb+');
         fwrite($source, $binaryBlob);
@@ -185,14 +198,22 @@ class EncryptionTest extends TestCase
 
         $targetFilesystem->writeStream($filePath, $source);
 
+        $temp1 = stream_get_contents($targetFilesystem->readStream($filePath));
+        if ($temp1 === false) {
+            static::fail('cannot read stream');
+        }
         static::assertSame(
             sha1($binaryBlob),
-            sha1(stream_get_contents($targetFilesystem->readStream($filePath)))
+            sha1($temp1)
         );
 
+        $temp2 = $targetFilesystem->read($filePath);
+        if ($temp2 === false) {
+            static::fail('cannot read stream');
+        }
         static::assertSame(
             sha1($binaryBlob),
-            sha1($targetFilesystem->read($filePath))
+            sha1($temp2)
         );
     }
 }
