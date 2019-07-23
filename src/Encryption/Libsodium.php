@@ -69,14 +69,13 @@ class Libsodium implements EncryptionInterface
     {
         stream_set_chunk_size($resource, $this->chunkSize);
 
-        $counter        = 0;
         $additionalData = [];
 
         append(
             $resource,
-            function (string $chunk) use (&$counter, &$additionalData): string {
+            function (string $chunk) use (&$additionalData): string {
                 $payload = '';
-                if ($counter === 0) {
+                if (!isset($additionalData['stream'])) {
                     [$stream, $header] = sodium_crypto_secretstream_xchacha20poly1305_init_push($this->key);
 
                     $additionalData['stream'] = $stream;
@@ -94,8 +93,6 @@ class Libsodium implements EncryptionInterface
 
                 $payload .= $encryptedChunk;
 
-                $counter += mb_strlen($chunk);
-
                 return $payload;
             }
         );
@@ -106,6 +103,7 @@ class Libsodium implements EncryptionInterface
      */
     public function appendDecryptStreamFilter($resource): void
     {
+        stream_set_chunk_size($resource, SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES);
         $header = stream_get_contents($resource, SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES);
 
         if ($header === false) {
