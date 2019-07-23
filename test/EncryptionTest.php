@@ -124,6 +124,29 @@ class EncryptionTest extends TestCase
     }
 
     /** @dataProvider chunkSizeProvider */
+    public function testEncryptionAndDecryptionUpdateText($chunkSize): void
+    {
+        $filePath    = '/demo.txt';
+        $randomBytes = openssl_random_pseudo_bytes(20);
+        if ($randomBytes === false) {
+            static::fail('cannot get random bytes');
+        }
+        $content = bin2hex($randomBytes);
+
+        $sourceFilesystem = $this->createTestFilesystem();
+
+        static::assertTrue($sourceFilesystem->put($filePath, ''));
+        static::assertTrue($sourceFilesystem->update($filePath, $content));
+        static::assertTrue($sourceFilesystem->has($filePath));
+
+        $targetFilesystem = $this->createEncryptedTestFilesystem(new MemoryAdapter(), self::KEY, $chunkSize);
+        $targetFilesystem->put($filePath, '');
+        $targetFilesystem->update($filePath, $sourceFilesystem->read($filePath));
+
+        static::assertSame($content, $targetFilesystem->read($filePath));
+    }
+
+    /** @dataProvider chunkSizeProvider */
     public function testStreamedTextFile(int $chunkSize): void
     {
         $string = 'Test text encryption!';
