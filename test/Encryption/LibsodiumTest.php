@@ -23,6 +23,7 @@ use function stream_get_contents;
 use function stream_set_chunk_size;
 
 /**
+ * @covers \AlexTartan\Flysystem\Adapter\Encryption\AbstractEncryption
  * @covers \AlexTartan\Flysystem\Adapter\Encryption\Libsodium
  * @covers \AlexTartan\Flysystem\Adapter\EncryptionAdapterDecorator
  */

@@ -6,9 +6,6 @@ namespace AlexTartan\Flysystem\Adapter\Encryption;
 
 use InvalidArgumentException;
 use function Clue\StreamFilter\append;
-use function fopen;
-use function fwrite;
-use function rewind;
 use function sodium_crypto_secretstream_xchacha20poly1305_init_pull;
 use function sodium_crypto_secretstream_xchacha20poly1305_init_push;
 use function sodium_crypto_secretstream_xchacha20poly1305_pull;
@@ -20,7 +17,7 @@ use const SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES;
 use const SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL;
 use const SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_MESSAGE;
 
-class Libsodium implements EncryptionInterface
+class Libsodium extends AbstractEncryption
 {
     public const MIN_CHUNK_SIZE = SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES + 1;
     public const MAX_CHUNK_SIZE = 8192;
@@ -39,40 +36,6 @@ class Libsodium implements EncryptionInterface
 
         $this->key       = $encryptionKey;
         $this->chunkSize = $chunkSize;
-    }
-
-    public function encrypt(string $contents): ?string
-    {
-        $source = $this->createTemporaryStreamFromContents($contents);
-        if ($source === null) {
-            return null;
-        }
-
-        $this->appendEncryptStreamFilter($source);
-
-        $result = stream_get_contents($source);
-        if ($result === false) {
-            return null;
-        }
-
-        return $result;
-    }
-
-    public function decrypt(string $contents): ?string
-    {
-        $source = $this->createTemporaryStreamFromContents($contents);
-        if ($source === null) {
-            return null;
-        }
-
-        $this->appendDecryptStreamFilter($source);
-
-        $result = stream_get_contents($source);
-        if ($result === false) {
-            return null;
-        }
-
-        return $result;
     }
 
     /**
@@ -142,22 +105,5 @@ class Libsodium implements EncryptionInterface
                 return $payload;
             }
         );
-    }
-
-    /**
-     * @return null|resource
-     */
-    private function createTemporaryStreamFromContents(string $contents)
-    {
-        $source = fopen('php://memory', 'wb+');
-        if ($source === false) {
-            return null;
-        }
-        stream_set_chunk_size($source, $this->chunkSize);
-
-        fwrite($source, $contents);
-        rewind($source);
-
-        return $source;
     }
 }
