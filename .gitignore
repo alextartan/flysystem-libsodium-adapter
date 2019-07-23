@@ -1,0 +1,5 @@
+# Created by .ignore support plugin (hsz.mobi)
+/vendor/
+/.idea/
+infection-log.txt
+.phpunit.result.cache

@@ -1,0 +1,36 @@
+sudo: false
+language: php
+cache:
+  directories:
+  - $HOME/.composer/cache
+matrix:
+  include:
+  - php: 7.2
+    env:
+    - CS_CHECK=true
+    - TEST_COVERAGE=true
+    - PHPSTAN=true
+  - php: 7.3
+    env:
+    - CS_CHECK=false
+    - TEST_COVERAGE=false
+    - PHPSTAN=false
+before_install:
+- if [[ $TEST_COVERAGE != 'true' ]]; then phpenv config-rm xdebug.ini || return 0 ; fi
+- travis_retry composer self-update
+install:
+- travis_retry composer install --no-interaction --ignore-platform-reqs
+- stty cols 120
+- export COLUMNS=120
+- composer show
+script:
+- if [[ $TEST_COVERAGE == 'true' ]]; then composer test-coverage && composer test-infection ; else composer test ; fi
+- if [[ $CS_CHECK == 'true' ]]; then composer cs-check ; fi
+- if [[ $PHPSTAN == 'true' ]]; then composer phpstan ; fi
+after_script:
+- if [[ $TEST_COVERAGE == 'true' ]]; then composer upload-coverage ; fi
+notifications:
+  email: false
+env:
+  global:
+    secure: eXE+UAb3ygI1McPfQuWW7yXkZlGis+SsV+jTnDDNhlSGUDB1f+fUVv6fMXYecjGS1QzxZLr2P2NjsZykW1obEPOoPdPUMTi/xOs94kRjjZzK7NNCFOljPS/IJDk2RN0r9h740ABt5WrR5IUdCkNN/JRvASAPK7+HivLjIwEcEbJLLH6ituMtS95Uu6OcSgcoG9lTX6zqtM6wkIgK0og3WdKDozoUr6kpn7mmsPbv4e3Auulsh7SPOyxUoUHF17inUtgeTSKJClYmcVFp7oxs+UBhfXgU0TzM4JcBcnetTmnKFzuSHQpClKq+aH/zUyxzlpGTSpNrhlc+zLVBiiLooUsx4ZyPUU7NIRBiRWo1VBYnJI7tbjlrfBewDlO3JgM8QBeOzwMx+iGV+vZkxCD+Z8LXioNHNm5KajAaAf6oLi/uGZH0HNk+C9wH3xbWFJw/4OuWkb9zNzbk7aqqLgaBozz9RdEcGkh0q1LJmXYppOI9sdQ1wzai1j/Eg57Bsx0u1j5Tk+JhrXYjKFwo7VnXpHHiH+3HPxCTqH5RQBj499eftK+yf780pbiIroauYciuiwTZVl8oFu1CKXvDZR+EW2bG+5YFR6Rsn6cgJIKbhQsydCkWOZTfX/R2LdWIGdk7jyWgSz4J0tUm2/g2gQxXUaAbqw2YKh7SFOUj2dUrnNM=

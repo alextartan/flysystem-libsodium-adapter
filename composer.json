@@ -1,0 +1,61 @@
+{
+  "name": "alextartan/flysystem-libsodium-adapter",
+  "description": "On-the-fly encrypt and decrypt flysystem files",
+  "keywords": [
+    "encryption",
+    "flysystem",
+    "libsodium"
+  ],
+  "type": "library",
+  "license": "Apache-2.0",
+  "authors": [
+    {
+      "name": "Alex Tartan",
+      "email": "alex.tartan@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.2",
+    "ext-mbstring": "*",
+    "clue/stream-filter": "^1.4.1",
+    "defuse/php-encryption": "^2.2",
+    "league/flysystem": "^1.0.53",
+    "league/flysystem-adapter-decorator": "^1.0.0"
+  },
+  "require-dev": {
+    "ext-openssl": "*",
+    "league/flysystem-memory": "^1.0.2",
+    "phpunit/phpunit": "^8.2.5",
+    "ext-mbstring": "*",
+    "infection/infection": "0.9.*",
+    "zendframework/zend-coding-standard": "^1.0.0",
+    "php-coveralls/php-coveralls": "~2.1",
+    "phpstan/phpstan": "~0.11",
+    "phpstan/phpstan-strict-rules": "~0.11",
+    "phpstan/phpstan-phpunit": "~0.11",
+    "roave/security-advisories": "dev-master"
+  },
+  "autoload": {
+    "psr-4": {
+      "AlexTartan\\Flysystem\\Adapter\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "AlexTartanTest\\Flysystem\\Adapter\\": "test/"
+    }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "prefer-stable": true,
+  "scripts": {
+    "cs-check": "vendor/bin/phpcs",
+    "cs-fix": "vendor/bin/phpcbf",
+    "test": "vendor/bin/phpunit --colors=always",
+    "phpstan": "vendor/bin/phpstan analyse",
+    "test-infection": "vendor/bin/infection --threads=4",
+    "test-coverage": "vendor/bin/phpunit --colors=always --coverage-clover clover.xml",
+    "upload-coverage": "vendor/bin/php-coveralls -v"
+  }
+}
