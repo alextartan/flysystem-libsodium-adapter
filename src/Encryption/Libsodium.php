@@ -4,18 +4,28 @@ declare(strict_types=1);
 
 namespace AlexTartan\Flysystem\Adapter\Encryption;
 
+use InvalidArgumentException;
 use function Clue\StreamFilter\append;
 
 class Libsodium implements EncryptionInterface
 {
-    public const CHUNK_SIZE = 1024;
+    public const MIN_CHUNK_SIZE = SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES + 1;
+    public const MAX_CHUNK_SIZE = 8192;
 
     /** @var string */
     private $key;
 
-    public function __construct(string $encryptionKey)
+    /** @var int */
+    private $chunkSize;
+
+    public function __construct(string $encryptionKey, int $chunkSize = 1024)
     {
-        $this->key = $encryptionKey;
+        if ($chunkSize < self::MIN_CHUNK_SIZE || $chunkSize > self::MAX_CHUNK_SIZE) {
+            throw new InvalidArgumentException('Invalid chunk size');
+        }
+
+        $this->key       = $encryptionKey;
+        $this->chunkSize = $chunkSize;
     }
 
     public function encrypt(string $contents): ?string
@@ -57,7 +67,7 @@ class Libsodium implements EncryptionInterface
      */
     public function appendEncryptStreamFilter($resource): void
     {
-        stream_set_chunk_size($resource, self::CHUNK_SIZE);
+        stream_set_chunk_size($resource, $this->chunkSize);
 
         $counter        = 0;
         $additionalData = [];
@@ -76,7 +86,7 @@ class Libsodium implements EncryptionInterface
                     $payload .= $header;
                 }
 
-                if (mb_strlen($chunk) < self::CHUNK_SIZE) {
+                if (mb_strlen($chunk) < $this->chunkSize) {
                     $additionalData['tag'] = SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL;
                 }
 
@@ -106,7 +116,7 @@ class Libsodium implements EncryptionInterface
         $additionalData['header'] = $header;
         $additionalData['stream'] = sodium_crypto_secretstream_xchacha20poly1305_init_pull($header, $this->key);
 
-        stream_set_chunk_size($resource, self::CHUNK_SIZE + SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES);
+        stream_set_chunk_size($resource, $this->chunkSize + SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES);
 
         append(
             $resource,
@@ -132,7 +142,7 @@ class Libsodium implements EncryptionInterface
         if ($source === false) {
             return null;
         }
-        stream_set_chunk_size($source, self::CHUNK_SIZE);
+        stream_set_chunk_size($source, $this->chunkSize);
 
         fwrite($source, $contents);
         rewind($source);

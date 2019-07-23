@@ -16,6 +16,16 @@ class EncryptionTest extends TestCase
 {
     private const KEY = 'ZG9Mc1U4ZGtlZ0thWXJxNXhtNTJTc1I5YjdjWm8vMlM1ZzlsRTJFZlNQST0=';
 
+    public function chunkSizeProvider(): array
+    {
+        return [
+            [1024],
+            [2048],
+            [4096],
+            [8192],
+        ];
+    }
+
     private function createTestFilesystem(): Filesystem
     {
         return new Filesystem(new MemoryAdapter());
@@ -36,29 +46,24 @@ class EncryptionTest extends TestCase
         return $key;
     }
 
-    /**
-     * @param AdapterInterface|null $adapter
-     * @param string                $encryptionKey
-     *
-     * @return Filesystem
-     */
     protected function createEncryptedTestFilesystem(
-        AdapterInterface $adapter = null,
-        $encryptionKey = self::KEY
+        AdapterInterface $adapter,
+        string $encryptionKey,
+        int $chunkSize
     ): Filesystem {
-        $adapter = $adapter ?? new MemoryAdapter();
-
         return new Filesystem(
             new EncryptionAdapterDecorator(
                 $adapter,
                 new Libsodium(
-                    $this->getEncryptionKeyFromEncoded($encryptionKey)
+                    $this->getEncryptionKeyFromEncoded($encryptionKey),
+                    $chunkSize
                 )
             )
         );
     }
 
-    public function testStoredContentIsEncrypted(): void
+    /** @dataProvider chunkSizeProvider */
+    public function testStoredContentIsEncrypted($chunkSize): void
     {
         $filePath    = '/demo.txt';
         $randomBytes = openssl_random_pseudo_bytes(20);
@@ -68,7 +73,7 @@ class EncryptionTest extends TestCase
         $content = bin2hex($randomBytes);
 
         $adapter    = new MemoryAdapter();
-        $encryption = new Libsodium($this->getEncryptionKeyFromEncoded(self::KEY));
+        $encryption = new Libsodium($this->getEncryptionKeyFromEncoded(self::KEY), $chunkSize);
         $filesystem = new Filesystem(new EncryptionAdapterDecorator($adapter, $encryption));
 
         $filesystem->put($filePath, $content);
@@ -80,7 +85,8 @@ class EncryptionTest extends TestCase
         static::assertNotSame($content, $adapter->read(Util::normalizePath($filePath)));
     }
 
-    public function testEncryptionAndDecryption(): void
+    /** @dataProvider chunkSizeProvider */
+    public function testEncryptionAndDecryption($chunkSize): void
     {
         $filePath    = '/demo.txt';
         $randomBytes = openssl_random_pseudo_bytes(20);
@@ -94,18 +100,19 @@ class EncryptionTest extends TestCase
         static::assertTrue($sourceFilesystem->put($filePath, $content));
         static::assertTrue($sourceFilesystem->has($filePath));
 
-        $targetFilesystem = $this->createEncryptedTestFilesystem();
+        $targetFilesystem = $this->createEncryptedTestFilesystem(new MemoryAdapter(), self::KEY, $chunkSize);
         $targetFilesystem->put($filePath, $sourceFilesystem->read($filePath));
 
         static::assertSame($content, $targetFilesystem->read($filePath));
     }
 
-    public function testStreamedTextFile(): void
+    /** @dataProvider chunkSizeProvider */
+    public function testStreamedTextFile(int $chunkSize): void
     {
         $string = 'Test text encryption!';
         $source = fopen('data://text/plain,' . $string, 'rb');
 
-        $targetFilesystem = $this->createEncryptedTestFilesystem();
+        $targetFilesystem = $this->createEncryptedTestFilesystem(new MemoryAdapter(), self::KEY, $chunkSize);
 
         $filePath = '/my-path.txt';
 
@@ -119,7 +126,8 @@ class EncryptionTest extends TestCase
         static::assertSame($string, $targetFilesystem->read($filePath));
     }
 
-    public function testStreamedBinaryFile(): void
+    /** @dataProvider chunkSizeProvider */
+    public function testStreamedBinaryFile(int $chunkSize): void
     {
         $binaryBlob = openssl_random_pseudo_bytes(2000000);
 
@@ -127,7 +135,7 @@ class EncryptionTest extends TestCase
         fwrite($source, $binaryBlob);
         rewind($source);
 
-        $targetFilesystem = $this->createEncryptedTestFilesystem();
+        $targetFilesystem = $this->createEncryptedTestFilesystem(new MemoryAdapter(), self::KEY, $chunkSize);
 
         $filePath = '/encrypted.bin';
 
