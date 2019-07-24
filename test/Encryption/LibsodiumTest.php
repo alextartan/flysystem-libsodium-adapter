@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AlexTartanTest\Flysystem\Adapter\Encryption;
 
-use AlexTartan\Flysystem\Adapter\Encryption\Libsodium;
+use AlexTartan\Flysystem\Adapter\ChunkEncryption\Libsodium;
 use AlexTartan\Flysystem\Adapter\EncryptionAdapterDecorator;
 use InvalidArgumentException;
 use League\Flysystem\AdapterInterface;
@@ -23,7 +23,7 @@ use function stream_get_contents;
 use function stream_set_chunk_size;
 
 /**
- * @covers \AlexTartan\Flysystem\Adapter\Encryption\Libsodium
+ * @covers \AlexTartan\Flysystem\Adapter\ChunkEncryption\Libsodium
  * @covers \AlexTartan\Flysystem\Adapter\EncryptionAdapterDecorator
  */
 class LibsodiumTest extends TestCase
@@ -95,7 +95,7 @@ class LibsodiumTest extends TestCase
         return new Filesystem(
             new EncryptionAdapterDecorator(
                 $adapter,
-                new Libsodium(
+                Libsodium::factory(
                     $this->getEncryptionKeyFromEncoded($encryptionKey),
                     $chunkSize
                 )
@@ -140,7 +140,7 @@ class LibsodiumTest extends TestCase
         $content = bin2hex($randomBytes);
 
         $adapter    = new MemoryAdapter();
-        $encryption = new Libsodium($this->getEncryptionKeyFromEncoded(self::KEY), $chunkSize);
+        $encryption = Libsodium::factory($this->getEncryptionKeyFromEncoded(self::KEY), $chunkSize);
         $filesystem = new Filesystem(new EncryptionAdapterDecorator($adapter, $encryption));
 
         $filesystem->put($filePath, $content);

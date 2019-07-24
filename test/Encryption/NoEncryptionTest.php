@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AlexTartanTest\Flysystem\Adapter\Encryption;
 
-use AlexTartan\Flysystem\Adapter\Encryption\NoEncryption;
+use AlexTartan\Flysystem\Adapter\ChunkEncryption\NoEncryption;
 use AlexTartan\Flysystem\Adapter\EncryptionAdapterDecorator;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Filesystem;
@@ -15,7 +15,7 @@ use function bin2hex;
 use function openssl_random_pseudo_bytes;
 
 /**
- * @covers \AlexTartan\Flysystem\Adapter\Encryption\NoEncryption
+ * @covers \AlexTartan\Flysystem\Adapter\ChunkEncryption\NoEncryption
  * @covers \AlexTartan\Flysystem\Adapter\EncryptionAdapterDecorator
  */
 class NoEncryptionTest extends TestCase
@@ -26,7 +26,7 @@ class NoEncryptionTest extends TestCase
         return new Filesystem(
             new EncryptionAdapterDecorator(
                 $adapter,
-                new NoEncryption()
+                NoEncryption::factory(4096)
             )
         );
     }

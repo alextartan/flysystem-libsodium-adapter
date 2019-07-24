@@ -49,6 +49,6 @@ The encrypted result is bigger than the original.
 This is still a work in progress. I hope to get this working with S3 soon.
 
 
-## Versoning
+## Versioning
 
 This library adheres to [semver](https://semver.org/)

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace AlexTartanTest\Flysystem\Adapter\Encryption;
 
-use AlexTartan\Flysystem\Adapter\Encryption\Libsodium;
+use AlexTartan\Flysystem\Adapter\ChunkEncryption\Libsodium;
 use AlexTartan\Flysystem\Adapter\EncryptionAdapterDecorator;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
@@ -39,7 +39,7 @@ class IntegrationTest extends TestCase
         $this->encryptedFs = new Filesystem(
             new EncryptionAdapterDecorator(
                 new Local(self::STORAGE_LOCATION),
-                new Libsodium(
+                Libsodium::factory(
                     $key,
                     8192
                 )

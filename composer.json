@@ -16,21 +16,19 @@
   ],
   "require": {
     "php": ">=7.2",
-    "ext-mbstring": "*",
     "clue/stream-filter": "^1.4.1",
     "league/flysystem": "^1.0.53",
     "league/flysystem-adapter-decorator": "^1.0.0"
   },
   "require-dev": {
     "ext-openssl": "*",
-    "ext-mbstring": "*",
-    "infection/infection": "0.13.*",
+    "infection/infection": "^0.13.4",
     "league/flysystem-memory": "^1.0.2",
-    "php-coveralls/php-coveralls": "~2.1",
+    "php-coveralls/php-coveralls": "^2.1",
     "phpunit/phpunit": "^8.2.5",
-    "phpstan/phpstan": "~0.11",
-    "phpstan/phpstan-strict-rules": "~0.11",
-    "phpstan/phpstan-phpunit": "~0.11",
+    "phpstan/phpstan": "^0.11",
+    "phpstan/phpstan-strict-rules": "^0.11",
+    "phpstan/phpstan-phpunit": "^0.11",
     "roave/security-advisories": "dev-master",
     "zendframework/zend-coding-standard": "^1.0.0"
   },
