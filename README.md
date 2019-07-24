@@ -1,6 +1,10 @@
 # Libsodium Adapter for Flysystem
 
-Work in progress... (see notice below)
+Performing on-the-fly client-side encryption for safe storage of files.
+
+On uploads, the content is encrypted using [Poly 1305](https://en.wikipedia.org/wiki/Poly1305) with a secret key and stored securely on the filesystem.
+
+On downloads, the content is decrypted. 
 
 Current build status
 ===
@@ -20,13 +24,12 @@ composer require alextartan/flysystem-libsodium-adapter
 ## Usage
 
 ```php
-use AlexTartan\Flysystem\Adapter\Encryption\Libsodium;
-use AlexTartan\Flysystem\Adapter\EncryptionAdapterDecorator;
+use AlexTartan\Flysystem\Adapter\ChunkEncryption\Libsodium;use AlexTartan\Flysystem\Adapter\EncryptionAdapterDecorator;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Memory\MemoryAdapter;
 
 $adapter = new MemoryAdapter();
-$encryption = new Libsodium($encryptionKey);
+$encryption = Libsodium::factory($encryptionKey, 4096);
 
 $adapterDecorator = new EncryptionAdapterDecorator(
     $adapter, 
@@ -38,16 +41,13 @@ $filesystem = new Filesystem($adapterDecorator);
 
 **Notice**;
 
-Encryption does not work with `writeStream`/`readStream` and `AWS S3` (and probably other remote adapters). 
+Due to how AwsS3 (and probably other remote adapters) handle stream uploads, 
+I had to change the way this lib worked (versions up to `v.1.0.0`)
 
-When using non-local adapters, use `write`/`read`. The downside of this is the high memory usage, as files 
-are entirely loaded in memory.
+New releases employ a `php://temp` stream in which the encryption is done 
+and once that finishes, the stream is sent to `writeStream`/`readStream`
 
-The issue (as far as I've investigated) is related to `ContentLenght` which is not properly calculated.
-The encrypted result is bigger than the original.
-
-This is still a work in progress. I hope to get this working with S3 soon.
-
+Performance wise, it handles ok from what i could see.
 
 ## Versioning
 
