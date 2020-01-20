@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace AlexTartanTest\Flysystem\Adapter\Encryption;
@@ -8,10 +9,13 @@ use AlexTartan\Flysystem\Adapter\EncryptionAdapterDecorator;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use PHPStan\Testing\TestCase;
+use PHPUnit\Runner\DefaultTestResultCache;
+
 use function base64_decode;
 use function file_get_contents;
 use function fopen;
 use function stream_get_contents;
+use function unserialize;
 
 class IntegrationTest extends TestCase
 {
@@ -139,5 +143,9 @@ class IntegrationTest extends TestCase
             $file,
             __DIR__ . '/../data/storage/original'
         );
+
+        // check unserialization integrity
+        $object = unserialize($contents);
+        static::assertInstanceOf(DefaultTestResultCache::class, $object);
     }
 }

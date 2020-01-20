@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace AlexTartan\Flysystem\Adapter\ChunkEncryption;
@@ -7,11 +8,9 @@ use AlexTartan\Flysystem\Adapter\Exception\EncryptionException;
 use Exception;
 use Generator;
 use InvalidArgumentException;
-use function fclose;
+
 use function feof;
-use function fopen;
 use function fread;
-use function fwrite;
 
 class Libsodium implements ChunkEncryption
 {

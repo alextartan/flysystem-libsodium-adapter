@@ -12,11 +12,13 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\Memory\MemoryAdapter;
 use League\Flysystem\Util;
 use PHPUnit\Framework\TestCase;
+
 use function base64_decode;
 use function bin2hex;
 use function fopen;
 use function fwrite;
 use function openssl_random_pseudo_bytes;
+use function random_bytes;
 use function rewind;
 use function sha1;
 use function stream_get_contents;
@@ -30,6 +32,7 @@ class LibsodiumTest extends TestCase
 {
     private const KEY = 'ZG9Mc1U4ZGtlZ0thWXJxNXhtNTJTc1I5YjdjWm8vMlM1ZzlsRTJFZlNQST0=';
 
+    /** @return array<int, array<int, int>> */
     public function chunkSizeProvider(): array
     {
         $chunks = [
@@ -59,6 +62,7 @@ class LibsodiumTest extends TestCase
         return $ret;
     }
 
+    /** @return array<int, array<int, int>> */
     public function invalidChunkSizeProvider(): array
     {
         return [
@@ -244,10 +248,7 @@ class LibsodiumTest extends TestCase
     /** @dataProvider chunkSizeProvider */
     public function testStreamedBinaryFile(int $chunkSize, int $contentLength): void
     {
-        $binaryBlob = openssl_random_pseudo_bytes($contentLength);
-        if ($binaryBlob === false) {
-            static::fail('cannot get random bytes');
-        }
+        $binaryBlob = random_bytes($contentLength);
 
         $source = fopen('php://memory', 'wb+');
         if ($source === false) {

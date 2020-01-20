@@ -15,22 +15,25 @@
     }
   ],
   "require": {
-    "php": ">=7.2",
-    "clue/stream-filter": "^1.4.1",
-    "league/flysystem": "^1.0.53",
-    "league/flysystem-adapter-decorator": "^1.0.0"
+    "php": ">=7.4",
+    "alextartan/helpers": "2.0.*",
+    "league/flysystem": "^1.0.63",
+    "league/flysystem-adapter-decorator": "^1.0.0",
+    "league/flysystem-aws-s3-v3": "^1.0.23",
+    "monolog/monolog": "^2.0.2"
   },
   "require-dev": {
     "ext-openssl": "*",
-    "infection/infection": "^0.13.4",
+    "infection/infection": "^0.15.0",
     "league/flysystem-memory": "^1.0.2",
-    "php-coveralls/php-coveralls": "^2.1",
-    "phpunit/phpunit": "^8.2.5",
-    "phpstan/phpstan": "^0.11",
-    "phpstan/phpstan-strict-rules": "^0.11",
-    "phpstan/phpstan-phpunit": "^0.11",
-    "roave/security-advisories": "dev-master",
-    "zendframework/zend-coding-standard": "^1.0.0"
+    "php-coveralls/php-coveralls": "^2.2.0",
+    "phpunit/phpunit": "^8.5.2",
+    "phpstan/phpstan": "^0.12.5",
+    "phpstan/phpstan-strict-rules": "^0.12.1",
+    "phpstan/phpstan-phpunit": "^0.12.6",
+    "symfony/var-dumper": "^5.0.2",
+    "squizlabs/php_codesniffer": "3.5.*",
+    "roave/security-advisories": "dev-master"
   },
   "autoload": {
     "psr-4": {

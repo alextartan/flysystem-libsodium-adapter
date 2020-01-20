@@ -11,8 +11,9 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\Memory\MemoryAdapter;
 use League\Flysystem\Util;
 use PHPUnit\Framework\TestCase;
+
 use function bin2hex;
-use function openssl_random_pseudo_bytes;
+use function random_bytes;
 
 /**
  * @covers \AlexTartan\Flysystem\Adapter\ChunkEncryption\NoEncryption
@@ -34,11 +35,8 @@ class NoEncryptionTest extends TestCase
     public function testStoredContentIsNotEncrypted(): void
     {
         $filePath    = '/demo.txt';
-        $randomBytes = openssl_random_pseudo_bytes(20);
-        if ($randomBytes === false) {
-            static::fail('cannot get random bytes');
-        }
-        $content = bin2hex($randomBytes);
+        $randomBytes = random_bytes(20);
+        $content     = bin2hex($randomBytes);
 
         $filesystem = $this->createEncryptedTestFilesystem(new MemoryAdapter());
 

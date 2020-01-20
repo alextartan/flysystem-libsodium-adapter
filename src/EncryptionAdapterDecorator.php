@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace AlexTartan\Flysystem\Adapter;
 
 use AlexTartan\Flysystem\Adapter\ChunkEncryption\ChunkEncryption;
-use AlexTartan\Flysystem\Adapter\ChunkEncryption\Libsodium;
 use AlexTartan\Flysystem\Adapter\Exception\EncryptionException;
-use Generator;
+use AlexTartan\Helpers\Stream\GeneratorReadStream;
 use League\Flysystem\AdapterDecorator\DecoratorTrait;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
+
 use function fopen;
 use function fwrite;
 use function rewind;
@@ -19,11 +19,9 @@ final class EncryptionAdapterDecorator implements AdapterInterface
 {
     use DecoratorTrait;
 
-    /** @var AdapterInterface */
-    protected $adapter;
+    protected AdapterInterface $adapter;
 
-    /** @var ChunkEncryption */
-    private $encryption;
+    private ChunkEncryption $encryption;
 
     /**
      * @param AdapterInterface $adapter
@@ -50,7 +48,7 @@ final class EncryptionAdapterDecorator implements AdapterInterface
      * @param string $contents
      * @param Config $config
      *
-     * @return array|false
+     * @return string[]|false
      */
     public function write($path, $contents, Config $config)
     {
@@ -71,7 +69,7 @@ final class EncryptionAdapterDecorator implements AdapterInterface
      * @param string $contents
      * @param Config $config
      *
-     * @return array|false
+     * @return string[]|false
      */
     public function update($path, $contents, Config $config)
     {
@@ -81,7 +79,7 @@ final class EncryptionAdapterDecorator implements AdapterInterface
     /**
      * @param string $path
      *
-     * @return array|false
+     * @return string[]|false
      */
     public function read($path)
     {
@@ -107,15 +105,24 @@ final class EncryptionAdapterDecorator implements AdapterInterface
      * @param resource $resource
      * @param Config   $config
      *
-     * @return array|false
+     * @return string[]|false
      */
     public function writeStream($path, $resource, Config $config)
     {
-        return $this->getDecoratedAdapter()->writeStream(
-            $path,
-            $this->createTemporaryStreamFromGenerator(
+        $readResource = fopen(
+            GeneratorReadStream::createResourceUrl(
                 $this->encryption->encryptResourceToGenerator($resource)
             ),
+            'rb'
+        );
+
+        if ($readResource === false) {
+            return false;
+        }
+
+        return $this->getDecoratedAdapter()->writeStream(
+            $path,
+            $readResource,
             $config
         );
     }
@@ -123,38 +130,27 @@ final class EncryptionAdapterDecorator implements AdapterInterface
     /**
      * @param string $path
      *
-     * @return array|false
+     * @return array<string, string|resource|false>|false
      */
     public function readStream($path)
     {
+        $readSteam = $this->getDecoratedAdapter()->readStream($path);
+        if ($readSteam === false) {
+            return false;
+        }
+
         return [
             'type'   => 'file',
             'path'   => $path,
-            'stream' => $this->createTemporaryStreamFromGenerator(
-                $this->encryption->decryptResourceToGenerator(
-                    $this->getDecoratedAdapter()->readStream($path)['stream']
-                )
+            'stream' => fopen(
+                GeneratorReadStream::createResourceUrl(
+                    $this->encryption->decryptResourceToGenerator(
+                        $readSteam['stream']
+                    )
+                ),
+                'rb'
             ),
         ];
-    }
-
-    /**
-     * @return resource
-     */
-    private function createTemporaryStreamFromGenerator(Generator $generator)
-    {
-        $handle = fopen('php://temp', 'rb+');
-        if ($handle === false) {
-            throw new EncryptionException();
-        }
-
-        foreach ($generator as $chunk) {
-            fwrite($handle, $chunk);
-        }
-
-        rewind($handle);
-
-        return $handle;
     }
 
     /**
