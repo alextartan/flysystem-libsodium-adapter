@@ -17,7 +17,6 @@ use function base64_decode;
 use function bin2hex;
 use function fopen;
 use function fwrite;
-use function openssl_random_pseudo_bytes;
 use function random_bytes;
 use function rewind;
 use function sha1;
@@ -137,11 +136,8 @@ class LibsodiumTest extends TestCase
     public function testStoredContentIsEncrypted(int $chunkSize, int $contentLength): void
     {
         $filePath    = '/demo.txt';
-        $randomBytes = openssl_random_pseudo_bytes($contentLength);
-        if ($randomBytes === false) {
-            static::fail('cannot get random bytes');
-        }
-        $content = bin2hex($randomBytes);
+        $randomBytes = random_bytes($contentLength);
+        $content     = bin2hex($randomBytes);
 
         $adapter    = new MemoryAdapter();
         $encryption = Libsodium::factory($this->getEncryptionKeyFromEncoded(self::KEY), $chunkSize);
@@ -165,11 +161,8 @@ class LibsodiumTest extends TestCase
     public function testEncryptionAndDecryption(int $chunkSize, int $contentLength): void
     {
         $filePath    = '/demo.txt';
-        $randomBytes = openssl_random_pseudo_bytes($contentLength);
-        if ($randomBytes === false) {
-            static::fail('cannot get random bytes');
-        }
-        $content = bin2hex($randomBytes);
+        $randomBytes = random_bytes($contentLength);
+        $content     = bin2hex($randomBytes);
 
         $sourceFilesystem = $this->createTestFilesystem();
 
@@ -192,11 +185,8 @@ class LibsodiumTest extends TestCase
     public function testEncryptionAndDecryptionUpdateText(int $chunkSize, int $contentLength): void
     {
         $filePath    = '/demo.txt';
-        $randomBytes = openssl_random_pseudo_bytes($contentLength);
-        if ($randomBytes === false) {
-            static::fail('cannot get random bytes');
-        }
-        $content = bin2hex($randomBytes);
+        $randomBytes = random_bytes($contentLength);
+        $content     = bin2hex($randomBytes);
 
         $sourceFilesystem = $this->createTestFilesystem();
 
@@ -218,7 +208,7 @@ class LibsodiumTest extends TestCase
     }
 
     /** @dataProvider chunkSizeProvider */
-    public function testStreamedTextFile(int $chunkSize, int $contentLength): void
+    public function testStreamedTextFile(int $chunkSize): void
     {
         $string = 'Test text encryption!';
         $source = $this->createTemporaryStreamFromContents($string, $chunkSize);

@@ -8,7 +8,7 @@ use AlexTartan\Flysystem\Adapter\ChunkEncryption\Libsodium;
 use AlexTartan\Flysystem\Adapter\EncryptionAdapterDecorator;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
-use PHPStan\Testing\TestCase;
+use PHPUnit\Framework\TestCase;
 use PHPUnit\Runner\DefaultTestResultCache;
 
 use function base64_decode;
@@ -21,11 +21,9 @@ class IntegrationTest extends TestCase
 {
     private const STORAGE_LOCATION = __DIR__ . '/../data/storage';
 
-    /** @var Filesystem */
-    private $encryptedFs;
+    private Filesystem $encryptedFs;
 
-    /** @var Filesystem */
-    private $plaintextFs;
+    private Filesystem $plaintextFs;
 
     public function setUp(): void
     {

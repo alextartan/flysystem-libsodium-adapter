@@ -17,11 +17,9 @@ class Libsodium implements ChunkEncryption
     public const MIN_CHUNK_SIZE = SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES + 1;
     public const MAX_CHUNK_SIZE = 8192;
 
-    /** @var string */
-    private $key;
+    private string $key;
 
-    /** @var int */
-    private $chunkSize;
+    private int $chunkSize;
 
     private function __construct(string $key, int $chunkSize)
     {
@@ -57,9 +55,7 @@ class Libsodium implements ChunkEncryption
             if (feof($resource)) {
                 $tag = SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL;
             }
-            $encrypted_chunk = sodium_crypto_secretstream_xchacha20poly1305_push($stream, $chunk, '', $tag);
-
-            yield $encrypted_chunk;
+            yield sodium_crypto_secretstream_xchacha20poly1305_push($stream, $chunk, '', $tag);
         } while ($tag !== SODIUM_CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL);
     }
 
