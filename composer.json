@@ -28,7 +28,7 @@
     "infection/infection": "^0.15.0 || ^0.16.0",
     "league/flysystem-memory": "^1.0.2",
     "php-coveralls/php-coveralls": "^2.2.0",
-    "phpunit/phpunit": "^8.5.2",
+    "phpunit/phpunit": "^8.5.2 || ^9.0.0",
     "phpstan/phpstan": "^0.12.5",
     "phpstan/phpstan-strict-rules": "^0.12.1",
     "phpstan/phpstan-phpunit": "^0.12.6",
