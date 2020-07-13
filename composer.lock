@@ -2631,20 +2631,20 @@
         },
         {
             "name": "phpunit/php-file-iterator",
-            "version": "3.0.2",
+            "version": "3.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-file-iterator.git",
-                "reference": "eba15e538f2bb3fe018b7bbb47d2fe32d404bfd2"
+                "reference": "25fefc5b19835ca653877fe081644a3f8c1d915e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-file-iterator/zipball/eba15e538f2bb3fe018b7bbb47d2fe32d404bfd2",
-                "reference": "eba15e538f2bb3fe018b7bbb47d2fe32d404bfd2",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-file-iterator/zipball/25fefc5b19835ca653877fe081644a3f8c1d915e",
+                "reference": "25fefc5b19835ca653877fe081644a3f8c1d915e",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.3"
+                "php": "^7.3 || ^8.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "^9.0"
@@ -2683,7 +2683,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-06-15T12:54:35+00:00"
+            "time": "2020-07-11T05:18:21+00:00"
         },
         {
             "name": "phpunit/php-invoker",
@@ -3013,12 +3013,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "6d2e5ab854782830911ddd33b7d4649b9f18c10f"
+                "reference": "881b9e4a8de3186c93904230bdf6344b685fe6a5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/6d2e5ab854782830911ddd33b7d4649b9f18c10f",
-                "reference": "6d2e5ab854782830911ddd33b7d4649b9f18c10f",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/881b9e4a8de3186c93904230bdf6344b685fe6a5",
+                "reference": "881b9e4a8de3186c93904230bdf6344b685fe6a5",
                 "shasum": ""
             },
             "conflict": {
@@ -3087,6 +3087,7 @@
                 "friendsofsymfony/user-bundle": ">=1.2,<1.3.5",
                 "fuel/core": "<1.8.1",
                 "getgrav/grav": "<1.7-beta.8",
+                "gos/web-socket-bundle": "<1.10.4|>=2,<2.6.1|>=3,<3.3",
                 "gree/jose": "<=2.2",
                 "gregwar/rst": "<1.0.3",
                 "guzzlehttp/guzzle": ">=4-rc.2,<4.2.4|>=5,<5.3.1|>=6,<6.2.1",
@@ -3112,8 +3113,9 @@
                 "magento/product-community-edition": ">=2,<2.2.10|>=2.3,<2.3.2-p.2",
                 "monolog/monolog": ">=1.8,<1.12",
                 "namshi/jose": "<2.2",
+                "nystudio107/craft-seomatic": "<3.3",
                 "nzo/url-encryptor-bundle": ">=4,<4.3.2|>=5,<5.0.1",
-                "october/october": ">=1.0.319,<1.0.466",
+                "october/october": ">=1.0.319,<1.0.467",
                 "onelogin/php-saml": "<2.10.4",
                 "oneup/uploader-bundle": "<1.9.3|>=2,<2.1.5",
                 "openid/php-openid": "<2.3",
@@ -3290,7 +3292,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-06-19T13:23:43+00:00"
+            "time": "2020-07-11T19:04:25+00:00"
         },
         {
             "name": "sanmai/pipeline",
