@@ -18,7 +18,7 @@
     "php": ">=7.4",
     "ext-sodium": "*",
     "alextartan/helpers": "2.0.* || 2.1.*",
-    "league/flysystem": "^1.0.63",
+    "league/flysystem": "^1.1.8",
     "league/flysystem-adapter-decorator": "^1.0.0",
     "league/flysystem-aws-s3-v3": "^1.0.23",
     "monolog/monolog": "^2.0.2"
